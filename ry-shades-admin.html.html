@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RY SHADES — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0c0c0c;--panel:#151515;--card:#1c1c1c;--border:#272727;--border2:#333;
+  --gold:#c9a84c;--gold-dim:rgba(201,168,76,0.12);--gold-light:#e8c96a;
+  --white:#f0ebe2;--muted:#666;--muted2:#444;
+  --green:#1a6b2a;--red:#8b1a1a;--blue:#1a3a6b;
+  --font-d:'Bebas Neue',sans-serif;--font-c:'Barlow Condensed',sans-serif;--font-b:'Barlow',sans-serif;
+  --sidebar:220px;
+}
+html,body{height:100%;background:var(--bg);color:var(--white);font-family:var(--font-b);overflow-x:hidden;}
+
+/* ─── LOGIN ─── */
+#loginScreen{
+  display:flex;position:fixed;inset:0;z-index:9999;
+  background:var(--bg);align-items:center;justify-content:center;
+}
+.login-box{
+  background:var(--panel);border:1px solid var(--border);padding:3rem;
+  width:340px;text-align:center;
+}
+.login-logo{font-family:var(--font-d);font-size:2.2rem;letter-spacing:0.1em;color:var(--gold);margin-bottom:0.3rem;}
+.login-sub{font-family:var(--font-c);font-size:0.7rem;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:var(--muted);margin-bottom:2rem;}
+.l-label{display:block;font-family:var(--font-c);font-size:0.65rem;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);margin-bottom:0.4rem;text-align:left;}
+.l-input{
+  width:100%;background:var(--card);border:1px solid var(--border2);color:var(--white);
+  font-family:var(--font-b);font-size:0.9rem;padding:0.75rem 1rem;outline:none;margin-bottom:1rem;
+  transition:border-color 0.2s;
+}
+.l-input:focus{border-color:var(--gold);}
+.l-btn{
+  width:100%;background:var(--gold);color:var(--bg);border:none;
+  font-family:var(--font-c);font-size:0.85rem;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;
+  padding:0.85rem;cursor:pointer;transition:background 0.2s;margin-top:0.5rem;
+}
+.l-btn:hover{background:var(--gold-light);}
+.l-err{color:#e74c3c;font-size:0.8rem;margin-top:0.5rem;display:none;}
+
+/* ─── LAYOUT ─── */
+#app{display:none;height:100%;flex-direction:column;}
+#app.visible{display:flex;}
+#topbar{
+  height:52px;background:var(--panel);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;
+  flex-shrink:0;
+}
+.tb-logo{font-family:var(--font-d);font-size:1.4rem;letter-spacing:0.1em;color:var(--gold);}
+.tb-right{display:flex;align-items:center;gap:1rem;}
+.tb-badge{
+  font-family:var(--font-c);font-size:0.65rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;
+  background:var(--gold-dim);color:var(--gold);border:1px solid rgba(201,168,76,0.25);
+  padding:0.25rem 0.7rem;
+}
+.tb-logout{
+  font-family:var(--font-c);font-size:0.65rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;
+  background:transparent;color:var(--muted);border:1px solid var(--border2);
+  padding:0.3rem 0.8rem;cursor:pointer;transition:color 0.2s,border-color 0.2s;
+}
+.tb-logout:hover{color:var(--white);border-color:var(--muted);}
+.preview-btn{
+  font-family:var(--font-c);font-size:0.65rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;
+  background:var(--gold);color:var(--bg);border:none;
+  padding:0.35rem 0.9rem;cursor:pointer;text-decoration:none;display:inline-block;
+}
+.preview-btn:hover{background:var(--gold-light);}
+
+.main-wrap{display:flex;flex:1;overflow:hidden;}
+
+/* ─── SIDEBAR ─── */
+#sidebar{
+  width:var(--sidebar);background:var(--panel);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;
+}
+.sb-section{padding:1.2rem 1rem 0.5rem;}
+.sb-section-label{
+  font-family:var(--font-c);font-size:0.6rem;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:0.6rem;padding:0 0.4rem;
+}
+.sb-item{
+  display:flex;align-items:center;gap:0.7rem;
+  font-family:var(--font-c);font-size:0.8rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--muted);padding:0.55rem 0.8rem;cursor:pointer;
+  border-radius:2px;transition:all 0.15s;border-left:2px solid transparent;
+}
+.sb-item:hover{color:var(--white);background:var(--card);}
+.sb-item.active{color:var(--gold);background:var(--gold-dim);border-left-color:var(--gold);}
+.sb-icon{width:16px;text-align:center;font-size:0.9rem;}
+.sb-divider{border:none;border-top:1px solid var(--border);margin:0.8rem 1rem;}
+
+/* ─── CONTENT ─── */
+#content{flex:1;overflow-y:auto;padding:2rem;}
+
+/* ─── TABS ─── */
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
+
+/* ─── CARDS / PANELS ─── */
+.page-header{margin-bottom:2rem;}
+.page-title{font-family:var(--font-d);font-size:2.2rem;letter-spacing:0.05em;color:var(--white);line-height:1;}
+.page-sub{font-family:var(--font-c);font-size:0.72rem;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);margin-top:0.3rem;}
+
+.panel{background:var(--card);border:1px solid var(--border);padding:1.5rem;margin-bottom:1.5rem;}
+.panel-title{
+  font-family:var(--font-c);font-size:0.8rem;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:1.2rem;padding-bottom:0.7rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+
+/* ─── FORM ─── */
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+.f-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem;}
+.f-group{margin-bottom:1rem;}
+.f-label{
+  display:block;font-family:var(--font-c);font-size:0.62rem;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:0.4rem;
+}
+.f-input,.f-select,.f-textarea{
+  width:100%;background:var(--panel);border:1px solid var(--border2);
+  color:var(--white);font-family:var(--font-b);font-size:0.88rem;
+  padding:0.65rem 0.9rem;outline:none;transition:border-color 0.2s;
+}
+.f-input:focus,.f-select:focus,.f-textarea:focus{border-color:var(--gold);}
+.f-input::placeholder,.f-textarea::placeholder{color:var(--muted2);}
+.f-select option{background:var(--panel);}
+.f-textarea{resize:vertical;min-height:90px;}
+.f-hint{font-size:0.72rem;color:var(--muted);margin-top:0.3rem;}
+
+/* ─── BUTTONS ─── */
+.btn{
+  font-family:var(--font-c);font-size:0.72rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;
+  padding:0.6rem 1.4rem;border:none;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.4rem;
+}
+.btn-gold{background:var(--gold);color:var(--bg);}
+.btn-gold:hover{background:var(--gold-light);}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2);}
+.btn-ghost:hover{color:var(--white);border-color:var(--muted);}
+.btn-green{background:var(--green);color:#fff;}
+.btn-green:hover{filter:brightness(1.15);}
+.btn-red{background:var(--red);color:#fff;}
+.btn-red:hover{filter:brightness(1.2);}
+.btn-sm{padding:0.35rem 0.8rem;font-size:0.65rem;}
+
+/* ─── STATS GRID ─── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
+.stat-card{background:var(--card);border:1px solid var(--border);padding:1.2rem 1.4rem;}
+.sc-val{font-family:var(--font-d);font-size:2rem;color:var(--gold);}
+.sc-label{font-family:var(--font-c);font-size:0.65rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-top:0.2rem;}
+
+/* ─── PRODUCTS TABLE ─── */
+.prod-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.7rem;}
+.prod-search{
+  background:var(--panel);border:1px solid var(--border2);color:var(--white);
+  font-family:var(--font-b);font-size:0.85rem;padding:0.55rem 0.9rem;outline:none;width:200px;
+}
+.prod-search:focus{border-color:var(--gold);}
+.prod-search::placeholder{color:var(--muted2);}
+
+table{width:100%;border-collapse:collapse;}
+th{
+  font-family:var(--font-c);font-size:0.62rem;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--muted);padding:0.7rem 0.8rem;text-align:left;border-bottom:1px solid var(--border2);white-space:nowrap;
+}
+td{padding:0.7rem 0.8rem;border-bottom:1px solid var(--border);font-size:0.85rem;vertical-align:middle;}
+tr:hover td{background:rgba(255,255,255,0.02);}
+.td-name{font-weight:500;color:var(--white);}
+.td-cat{font-family:var(--font-c);font-size:0.7rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);}
+.td-price{font-family:var(--font-d);font-size:1.1rem;color:var(--gold);}
+.td-old{font-size:0.75rem;color:var(--muted2);text-decoration:line-through;margin-left:4px;}
+.td-badge{font-family:var(--font-c);font-size:0.6rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:0.2rem 0.5rem;display:inline-block;}
+.badge-new{background:rgba(201,168,76,0.2);color:var(--gold);}
+.badge-hot{background:rgba(192,57,43,0.25);color:#e74c3c;}
+.badge-ltd{background:rgba(201,168,76,0.1);color:var(--gold);border:1px solid rgba(201,168,76,0.3);}
+.badge-sale{background:rgba(26,107,42,0.25);color:#2ecc71;}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;}
+.dot-on{background:#2ecc71;}
+.dot-off{background:#e74c3c;}
+.td-actions{display:flex;gap:0.4rem;white-space:nowrap;}
+.color-preview{display:flex;gap:4px;}
+.cp{width:14px;height:14px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);}
+
+/* ─── PRODUCT FORM MODAL ─── */
+#prodModal{
+  display:none;position:fixed;inset:0;z-index:800;
+  background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);
+  align-items:flex-start;justify-content:center;padding:2rem;overflow-y:auto;
+}
+#prodModal.open{display:flex;}
+.prod-modal-box{
+  background:var(--panel);border:1px solid var(--border2);
+  width:100%;max-width:700px;padding:2rem;margin:auto;position:relative;
+}
+.pm-title{font-family:var(--font-d);font-size:1.8rem;letter-spacing:0.05em;margin-bottom:1.5rem;color:var(--gold);}
+.pm-close{
+  position:absolute;top:1rem;right:1rem;background:none;border:none;
+  color:var(--muted);font-size:1.3rem;cursor:pointer;
+}
+.pm-close:hover{color:var(--white);}
+
+/* ─── COLOR BUILDER ─── */
+.color-builder{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.4rem;}
+.color-chip{
+  display:flex;align-items:center;gap:0.4rem;
+  background:var(--card);border:1px solid var(--border2);padding:0.3rem 0.6rem;
+}
+.color-chip-dot{width:16px;height:16px;border-radius:50%;border:1px solid rgba(255,255,255,0.2);}
+.color-chip-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.9rem;line-height:1;}
+.color-chip-del:hover{color:#e74c3c;}
+.color-add-row{display:flex;gap:0.5rem;margin-top:0.5rem;align-items:center;}
+.color-pick{width:38px;height:30px;border:1px solid var(--border2);padding:0;cursor:pointer;background:none;}
+
+/* ─── VALS BUILDER ─── */
+.val-row{display:grid;grid-template-columns:1fr 2fr auto;gap:0.5rem;margin-bottom:0.5rem;align-items:center;}
+
+/* ─── TOAST ─── */
+#toast{
+  position:fixed;bottom:2rem;right:2rem;z-index:9000;
+  background:var(--green);color:#fff;padding:0.9rem 1.5rem;
+  font-family:var(--font-c);font-size:0.8rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;
+  transform:translateY(80px);opacity:0;transition:all 0.3s;pointer-events:none;
+}
+#toast.show{transform:translateY(0);opacity:1;}
+#toast.err{background:var(--red);}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border2);}
+::-webkit-scrollbar-thumb:hover{background:var(--muted);}
+
+/* ─── CONTACT ITEMS EDITOR ─── */
+.ci-row{display:grid;grid-template-columns:2rem 1fr 2fr 2fr auto;gap:0.6rem;margin-bottom:0.5rem;align-items:center;}
+.ci-icon-inp{width:100%;background:var(--panel);border:1px solid var(--border2);color:var(--white);padding:0.5rem;font-size:1rem;text-align:center;outline:none;}
+.ci-inp{width:100%;background:var(--panel);border:1px solid var(--border2);color:var(--white);font-family:var(--font-b);font-size:0.82rem;padding:0.5rem 0.7rem;outline:none;}
+.ci-inp:focus,.ci-icon-inp:focus{border-color:var(--gold);}
+
+/* ─── SOCIAL EDITOR ─── */
+.soc-row{display:grid;grid-template-columns:80px 1fr auto;gap:0.5rem;margin-bottom:0.5rem;align-items:center;}
+
+/* ─── IMAGE UPLOAD ─── */
+.img-upload-area{
+  border:2px dashed var(--border2);padding:1.5rem;text-align:center;cursor:pointer;
+  transition:border-color 0.2s;position:relative;
+}
+.img-upload-area:hover{border-color:var(--gold);}
+.img-upload-area input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.img-upload-label{font-family:var(--font-c);font-size:0.72rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);}
+.img-preview{max-width:100%;max-height:120px;object-fit:contain;margin-top:0.8rem;display:none;}
+
+@media(max-width:700px){
+  #sidebar{display:none;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .f-row,.f-row-3{grid-template-columns:1fr;}
+  #content{padding:1rem;}
+  .ci-row{grid-template-columns:1fr 1fr;gap:0.4rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">RY SHADES</div>
+    <div class="login-sub">Admin Dashboard</div>
+    <label class="l-label">Password</label>
+    <input class="l-input" type="password" id="pwdInput" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="l-btn" onclick="doLogin()">Access Dashboard</button>
+    <div class="l-err" id="loginErr">Incorrect password. Try again.</div>
+    <div style="margin-top:1.5rem;font-family:var(--font-c);font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted2);">Default: ryshades2025</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div class="tb-logo">RY SHADES</div>
+    <div class="tb-right">
+      <span class="tb-badge">Admin Panel</span>
+      <a href="index.html" target="_blank" class="preview-btn">↗ Preview Site</a>
+      <button class="tb-logout" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="main-wrap">
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+      <div class="sb-section">
+        <div class="sb-section-label">Overview</div>
+        <div class="sb-item active" onclick="switchTab('dashboard')"><span class="sb-icon">⬛</span> Dashboard</div>
+      </div>
+      <hr class="sb-divider"/>
+      <div class="sb-section">
+        <div class="sb-section-label">Products</div>
+        <div class="sb-item" onclick="switchTab('products')"><span class="sb-icon">🕶</span> All Products</div>
+        <div class="sb-item" onclick="openProductModal()"><span class="sb-icon">＋</span> Add Product</div>
+      </div>
+      <hr class="sb-divider"/>
+      <div class="sb-section">
+        <div class="sb-section-label">Site Content</div>
+        <div class="sb-item" onclick="switchTab('hero')"><span class="sb-icon">🏠</span> Hero Section</div>
+        <div class="sb-item" onclick="switchTab('ticker')"><span class="sb-icon">📢</span> Ticker Banner</div>
+        <div class="sb-item" onclick="switchTab('about')"><span class="sb-icon">📖</span> About Section</div>
+        <div class="sb-item" onclick="switchTab('contact')"><span class="sb-icon">📞</span> Contact Info</div>
+        <div class="sb-item" onclick="switchTab('footer')"><span class="sb-icon">🔗</span> Footer & Socials</div>
+      </div>
+      <hr class="sb-divider"/>
+      <div class="sb-section">
+        <div class="sb-section-label">Settings</div>
+        <div class="sb-item" onclick="switchTab('settings')"><span class="sb-icon">⚙</span> Settings</div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div id="content">
+
+      <!-- DASHBOARD -->
+      <div class="tab-pane active" id="tab-dashboard">
+        <div class="page-header">
+          <div class="page-title">DASHBOARD</div>
+          <div class="page-sub">RY Shades — Site Overview</div>
+        </div>
+        <div class="stats-grid" id="statsGrid"></div>
+        <div class="panel">
+          <div class="panel-title">Quick Actions</div>
+          <div style="display:flex;gap:0.8rem;flex-wrap:wrap;">
+            <button class="btn btn-gold" onclick="switchTab('products');openProductModal()">＋ Add New Product</button>
+            <button class="btn btn-ghost" onclick="switchTab('products')">🕶 Manage Products</button>
+            <button class="btn btn-ghost" onclick="switchTab('hero')">🏠 Edit Hero</button>
+            <button class="btn btn-ghost" onclick="switchTab('contact')">📞 Edit Contact Info</button>
+            <a href="index.html" target="_blank" class="btn btn-ghost" style="text-decoration:none;">↗ Preview Website</a>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Recent Products</div>
+          <div id="dashRecentProds"></div>
+        </div>
+      </div>
+
+      <!-- PRODUCTS -->
+      <div class="tab-pane" id="tab-products">
+        <div class="page-header">
+          <div class="page-title">PRODUCTS</div>
+          <div class="page-sub">Manage your frames collection</div>
+        </div>
+        <div class="panel">
+          <div class="prod-toolbar">
+            <input class="prod-search" id="prodSearch" placeholder="Search products..." oninput="renderProdTable()"/>
+            <button class="btn btn-gold" onclick="openProductModal()">＋ Add Product</button>
+          </div>
+          <div style="overflow-x:auto;"><table id="prodTable"><thead><tr>
+            <th>Name</th><th>Category</th><th>Price</th><th>Badge</th><th>Colors</th><th>Status</th><th>Actions</th>
+          </tr></thead><tbody id="prodTableBody"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- HERO -->
+      <div class="tab-pane" id="tab-hero">
+        <div class="page-header"><div class="page-title">HERO SECTION</div><div class="page-sub">Edit the main hero banner content</div></div>
+        <div class="panel">
+          <div class="panel-title">Hero Content</div>
+          <div class="f-group"><label class="f-label">Tag Line (small text above title)</label><input class="f-input" id="h_tag" placeholder="New Collection 2025"/></div>
+          <div class="f-group"><label class="f-label">Main Title</label><input class="f-input" id="h_title" placeholder="BLOCK OUT THE NOISE."/><div class="f-hint">Last word will be highlighted in gold. Use spaces between words.</div></div>
+          <div class="f-group"><label class="f-label">Subtitle / Description</label><textarea class="f-textarea" id="h_sub"></textarea></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Stats Bar (3 counters)</div>
+          <div class="f-row">
+            <div class="f-group"><label class="f-label">Stat 1 Number</label><input class="f-input" id="h_stat1"/></div>
+            <div class="f-group"><label class="f-label">Stat 1 Label</label><input class="f-input" id="h_statL1"/></div>
+          </div>
+          <div class="f-row">
+            <div class="f-group"><label class="f-label">Stat 2 Number</label><input class="f-input" id="h_stat2"/></div>
+            <div class="f-group"><label class="f-label">Stat 2 Label</label><input class="f-input" id="h_statL2"/></div>
+          </div>
+          <div class="f-row">
+            <div class="f-group"><label class="f-label">Stat 3 Number</label><input class="f-input" id="h_stat3"/></div>
+            <div class="f-group"><label class="f-label">Stat 3 Label</label><input class="f-input" id="h_statL3"/></div>
+          </div>
+          <button class="btn btn-gold" onclick="saveHero()">💾 Save Hero Section</button>
+        </div>
+      </div>
+
+      <!-- TICKER -->
+      <div class="tab-pane" id="tab-ticker">
+        <div class="page-header"><div class="page-title">TICKER BANNER</div><div class="page-sub">The scrolling gold strip below the hero</div></div>
+        <div class="panel">
+          <div class="panel-title">Ticker Text</div>
+          <div class="f-group">
+            <label class="f-label">Ticker Items — separate with ◆</label>
+            <textarea class="f-textarea" id="t_ticker" style="min-height:120px;"></textarea>
+            <div class="f-hint">Example: RY SHADES ◆ STREETWEAR EYEWEAR ◆ UV400 PROTECTION ◆ NEW DROP 2025</div>
+          </div>
+          <button class="btn btn-gold" onclick="saveTicker()">💾 Save Ticker</button>
+        </div>
+      </div>
+
+      <!-- ABOUT -->
+      <div class="tab-pane" id="tab-about">
+        <div class="page-header"><div class="page-title">ABOUT SECTION</div><div class="page-sub">Edit your brand story and values</div></div>
+        <div class="panel">
+          <div class="panel-title">Brand Story</div>
+          <div class="f-row">
+            <div class="f-group"><label class="f-label">Section Tag (e.g. "Since 2022")</label><input class="f-input" id="a_tag"/></div>
+            <div class="f-group"><label class="f-label">Section Title</label><input class="f-input" id="a_title" placeholder="MORE THAN JUST SHADES"/><div class="f-hint">Last word highlighted in gold</div></div>
+          </div>
+          <div class="f-group"><label class="f-label">Paragraph 1</label><textarea class="f-textarea" id="a_text1"></textarea></div>
+          <div class="f-group"><label class="f-label">Paragraph 2</label><textarea class="f-textarea" id="a_text2"></textarea></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Brand Values (4 items)</div>
+          <div id="valsBuilder"></div>
+          <button class="btn btn-ghost btn-sm" onclick="addVal()" style="margin-bottom:1rem;">＋ Add Value</button><br/>
+          <button class="btn btn-gold" onclick="saveAbout()">💾 Save About Section</button>
+        </div>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="tab-pane" id="tab-contact">
+        <div class="page-header"><div class="page-title">CONTACT INFO</div><div class="page-sub">Edit all contact details shown on the website</div></div>
+        <div class="panel">
+          <div class="panel-title">Section Title</div>
+          <div class="f-group"><label class="f-label">Contact Section Heading (gold word)</label><input class="f-input" id="c_title" placeholder="SHADES."/></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Contact Items</div>
+          <div style="font-family:var(--font-c);font-size:0.65rem;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:0.8rem;display:grid;grid-template-columns:2rem 1fr 2fr 2fr auto;gap:0.6rem;">
+            <span>Icon</span><span>Label</span><span>Value</span><span>Subtitle</span><span></span>
+          </div>
+          <div id="contactItemsBuilder"></div>
+          <button class="btn btn-ghost btn-sm" onclick="addContactItem()" style="margin-top:0.5rem;">＋ Add Item</button>
+        </div>
+        <button class="btn btn-gold" onclick="saveContact()">💾 Save Contact Info</button>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="tab-pane" id="tab-footer">
+        <div class="page-header"><div class="page-title">FOOTER & SOCIALS</div><div class="page-sub">Edit footer text and social media links</div></div>
+        <div class="panel">
+          <div class="panel-title">Footer Copyright</div>
+          <div class="f-group"><label class="f-label">Footer Copyright Text</label><input class="f-input" id="f_copy"/></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Social Links</div>
+          <div style="font-family:var(--font-c);font-size:0.65rem;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:0.8rem;display:grid;grid-template-columns:80px 1fr auto;gap:0.5rem;">
+            <span>Label</span><span>URL</span><span></span>
+          </div>
+          <div id="socialsBuilder"></div>
+          <button class="btn btn-ghost btn-sm" onclick="addSocial()" style="margin-top:0.5rem;">＋ Add Social</button>
+        </div>
+        <button class="btn btn-gold" onclick="saveFooter()">💾 Save Footer & Socials</button>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="tab-pane" id="tab-settings">
+        <div class="page-header"><div class="page-title">SETTINGS</div><div class="page-sub">Admin password and data management</div></div>
+        <div class="panel">
+          <div class="panel-title">Change Admin Password</div>
+          <div class="f-row">
+            <div class="f-group"><label class="f-label">New Password</label><input class="f-input" type="password" id="newPwd"/></div>
+            <div class="f-group"><label class="f-label">Confirm Password</label><input class="f-input" type="password" id="newPwd2"/></div>
+          </div>
+          <button class="btn btn-gold" onclick="changePassword()">🔒 Update Password</button>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Data Management</div>
+          <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+            <button class="btn btn-ghost" onclick="exportData()">📤 Export Site Data (JSON)</button>
+            <button class="btn btn-ghost" onclick="importTrigger()">📥 Import Site Data</button>
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)"/>
+            <button class="btn btn-red" onclick="resetData()">🗑 Reset to Default</button>
+          </div>
+          <div class="f-hint" style="margin-top:0.8rem;">Export saves all products and site content. Import restores from a previously exported file. Reset removes all changes.</div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main-wrap -->
+</div><!-- /app -->
+
+<!-- PRODUCT MODAL -->
+<div id="prodModal">
+  <div class="prod-modal-box">
+    <div class="pm-title" id="pmTitle">ADD PRODUCT</div>
+    <button class="pm-close" onclick="closeProdModal()">✕</button>
+    <input type="hidden" id="pm_id"/>
+    <div class="f-row">
+      <div class="f-group"><label class="f-label">Product Name</label><input class="f-input" id="pm_name" placeholder="RY-07 Shadow"/></div>
+      <div class="f-group"><label class="f-label">Style Description</label><input class="f-input" id="pm_style" placeholder="Wraparound · Matte Black"/></div>
+    </div>
+    <div class="f-row">
+      <div class="f-group"><label class="f-label">Category</label>
+        <select class="f-select" id="pm_cat">
+          <option>Street</option><option>Sport</option><option>Classic</option><option>Limited</option><option>Summer</option>
+        </select>
+      </div>
+      <div class="f-group"><label class="f-label">Badge</label>
+        <select class="f-select" id="pm_badge">
+          <option value="">None</option><option value="new">NEW</option><option value="hot">HOT</option><option value="ltd">LIMITED</option><option value="sale">SALE</option>
+        </select>
+      </div>
+    </div>
+    <div class="f-row">
+      <div class="f-group"><label class="f-label">Price ($)</label><input class="f-input" id="pm_price" type="number" min="0"/></div>
+      <div class="f-group"><label class="f-label">Old Price ($) — leave empty if no sale</label><input class="f-input" id="pm_oldPrice" type="number" min="0" placeholder="Optional"/></div>
+    </div>
+    <div class="f-row">
+      <div class="f-group"><label class="f-label">Material</label><input class="f-input" id="pm_material" placeholder="TR90 Nylon"/></div>
+      <div class="f-group"><label class="f-label">UV Protection</label><input class="f-input" id="pm_uv" placeholder="UV400"/></div>
+    </div>
+    <div class="f-group"><label class="f-label">Description</label><textarea class="f-textarea" id="pm_desc" placeholder="Product description visible in the popup modal..."></textarea></div>
+    <div class="f-group">
+      <label class="f-label">Product Image (optional)</label>
+      <div class="img-upload-area" onclick="document.getElementById('pm_imgFile').click()">
+        <input type="file" id="pm_imgFile" accept="image/*" style="display:none" onchange="handleImgUpload(this)"/>
+        <div class="img-upload-label">Click to upload image (JPG, PNG, WEBP)</div>
+        <img id="pm_imgPreview" class="img-preview"/>
+      </div>
+      <input class="f-input" id="pm_imgUrl" placeholder="Or paste image URL" style="margin-top:0.5rem;" oninput="previewFromUrl()"/>
+      <input type="hidden" id="pm_img"/>
+    </div>
+    <div class="f-group">
+      <label class="f-label">Frame Colors</label>
+      <div class="color-builder" id="colorBuilder"></div>
+      <div class="color-add-row">
+        <input type="color" class="color-pick" id="colorPicker" value="#c9a84c"/>
+        <button class="btn btn-ghost btn-sm" onclick="addColor()">＋ Add Color</button>
+      </div>
+    </div>
+    <div class="f-group">
+      <label class="f-label">Status</label>
+      <select class="f-select" id="pm_avail">
+        <option value="true">Available (visible in shop)</option>
+        <option value="false">Hidden (not shown in shop)</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:0.8rem;margin-top:1rem;">
+      <button class="btn btn-gold" onclick="saveProduct()">💾 Save Product</button>
+      <button class="btn btn-ghost" onclick="closeProdModal()">Cancel</button>
+      <button class="btn btn-red" id="deleteBtn" style="display:none" onclick="deleteProduct()">🗑 Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ─── AUTH ───
+const DEFAULT_PWD = 'ryshades2025';
+function getPwd(){return localStorage.getItem('ryAdminPwd')||DEFAULT_PWD;}
+function doLogin(){
+  const v=document.getElementById('pwdInput').value;
+  if(v===getPwd()){
+    localStorage.setItem('ryAdminSession','1');
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').classList.add('visible');
+    initApp();
+  } else {
+    document.getElementById('loginErr').style.display='block';
+    document.getElementById('pwdInput').value='';
+  }
+}
+function doLogout(){localStorage.removeItem('ryAdminSession');location.reload();}
+function changePassword(){
+  const a=document.getElementById('newPwd').value;const b=document.getElementById('newPwd2').value;
+  if(!a){return toast('Enter a new password','err');}
+  if(a!==b){return toast('Passwords do not match','err');}
+  localStorage.setItem('ryAdminPwd',a);
+  document.getElementById('newPwd').value='';document.getElementById('newPwd2').value='';
+  toast('Password updated');
+}
+// Auto login if session active
+if(localStorage.getItem('ryAdminSession')==='1'){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').classList.add('visible');
+}
+
+// ─── DATA ───
+const DEFAULT={
+  hero:{tag:"New Collection 2025",title:"BLOCK OUT THE NOISE.",sub:"Sunglasses built for the streets. Designed for those who see the world differently — bold frames, uncompromising style.",stat1:"200+",statL1:"Frame Styles",stat2:"UV400",statL2:"Protection",stat3:"LB",statL3:"Born in Lebanon"},
+  ticker:"RY SHADES ◆ STREETWEAR EYEWEAR ◆ UV400 PROTECTION ◆ NEW DROP 2025 ◆ MADE FOR THE BOLD ◆ LEBANESE BRAND",
+  about:{tag:"Since 2022",title:"MORE THAN JUST SHADES",text1:"RY Shades started as a passion project — a belief that eyewear should be as bold as the person wearing it. Born on the streets, shaped by culture, and built for those who refuse to blend in.",text2:"Every frame is hand-selected for quality, durability, and that unmistakable attitude that sets RY apart. Whether you're at the beach in Jounieh or the streets of Hamra — we've got your look covered.",vals:[{t:"Quality First",d:"Premium materials, UV400 protection on every single frame."},{t:"Bold Design",d:"Frames that make a statement before you say a word."},{t:"Local Brand",d:"Proudly Lebanese — designed for our culture and our sun."},{t:"Affordable",d:"Premium look, prices that don't burn a hole in your pocket."}]},
+  contact:{title:"SHADES.",items:[{icon:"📍",label:"Location",val:"Beirut, Lebanon",sub:"Available for pickup & local delivery"},{icon:"📱",label:"WhatsApp / Phone",val:"70 168 527",sub:"Mon – Sat, 10AM – 8PM"},{icon:"✉️",label:"Email",val:"info@ryshades.com",sub:"We reply within 24 hours"},{icon:"📸",label:"Instagram",val:"@ryshades",sub:"DM us anytime"}]},
+  socials:[{label:"IG",url:"#"},{label:"TK",url:"#"},{label:"FB",url:"#"},{label:"WA",url:"#"}],
+  footer:"© 2025 RY Shades. All rights reserved. Lebanon.",
+  products:[
+    {id:1,name:"RY-01 Phantom",style:"Square Frame · Gold Mirror",category:"Street",badge:"new",price:89,oldPrice:null,desc:"Our signature square frame with a mirror gold finish. Built for those who make an entrance.",colors:["#0a0a0a","#2c1810","#1a1a2e"],material:"TR90 Nylon",uv:"UV400",available:true,image:""},
+    {id:2,name:"RY-02 Striker",style:"Oval Sport · Red Shield",category:"Sport",badge:"hot",price:75,oldPrice:null,desc:"Performance-ready oval sport frame. Lightweight design meets street-level attitude.",colors:["#c0392b","#0a0a0a","#2d4a1e"],material:"Polycarbonate",uv:"UV400",available:true,image:""},
+    {id:3,name:"RY-03 Cipher",style:"Round Classic · Silver",category:"Classic",badge:"ltd",price:110,oldPrice:130,desc:"Limited edition round frame in brushed silver. A timeless silhouette with a modern edge.",colors:["#888888","#c9a84c","#0a0a0a"],material:"Stainless Steel",uv:"UV400",available:true,image:""},
+    {id:4,name:"RY-04 Prism",style:"Geometric · Gold Frame",category:"Street",badge:"",price:95,oldPrice:null,desc:"Angular geometric design in a bold gold frame. For those who see the world from a different angle.",colors:["#c9a84c","#0a0a0a"],material:"Zinc Alloy",uv:"UV400",available:true,image:""},
+    {id:5,name:"RY-05 Apex",style:"Wrap Sport · Forest",category:"Sport",badge:"new",price:82,oldPrice:null,desc:"Wrap-around sport frame in deep forest green. Full coverage, full style.",colors:["#2d4a1e","#0a0a0a","#c0392b"],material:"TR90 Nylon",uv:"UV400",available:true,image:""},
+    {id:6,name:"RY-06 Heritage",style:"Wayfarer · Tortoise",category:"Classic",badge:"",price:68,oldPrice:null,desc:"The classic wayfarer reimagined in tortoise shell. Old school cool, RY edition.",colors:["#3d1f0a","#0a0a0a","#1a1a2e"],material:"Acetate",uv:"UV400",available:true,image:""}
+  ]
+};
+function getData(){try{return JSON.parse(localStorage.getItem('ryShadesData'))||JSON.parse(JSON.stringify(DEFAULT));}catch{return JSON.parse(JSON.stringify(DEFAULT));}}
+function saveData(d){localStorage.setItem('ryShadesData',JSON.stringify(d));window.dispatchEvent(new StorageEvent('storage'));}
+function nextId(d){return Math.max(0,...(d.products||[]).map(p=>p.id))+1;}
+
+// ─── TOAST ───
+let toastTimer;
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='show'+(type?' '+type:'');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.className='',2800);
+}
+
+// ─── TABS ───
+function switchTab(id){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  document.getElementById('tab-'+id)?.classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i=>{if(i.textContent.toLowerCase().includes(id.substring(0,4)))i.classList.add('active');});
+  if(id==='dashboard')renderDashboard();
+  if(id==='products')renderProdTable();
+  if(id==='hero')loadHeroForm();
+  if(id==='ticker')loadTickerForm();
+  if(id==='about'){loadAboutForm();renderValsBuilder();}
+  if(id==='contact'){loadContactForm();renderContactItems();}
+  if(id==='footer'){loadFooterForm();renderSocialsBuilder();}
+}
+
+// ─── INIT ───
+function initApp(){renderDashboard();}
+
+// ─── DASHBOARD ───
+function renderDashboard(){
+  const d=getData();const prods=d.products||[];
+  const avail=prods.filter(p=>p.available).length;
+  const hidden=prods.filter(p=>!p.available).length;
+  const cats=[...new Set(prods.map(p=>p.category))].length;
+  document.getElementById('statsGrid').innerHTML=`
+    <div class="stat-card"><div class="sc-val">${prods.length}</div><div class="sc-label">Total Products</div></div>
+    <div class="stat-card"><div class="sc-val" style="color:#2ecc71">${avail}</div><div class="sc-label">Live in Shop</div></div>
+    <div class="stat-card"><div class="sc-val" style="color:#e74c3c">${hidden}</div><div class="sc-label">Hidden</div></div>
+    <div class="stat-card"><div class="sc-val">${cats}</div><div class="sc-label">Categories</div></div>`;
+  document.getElementById('dashRecentProds').innerHTML=`<div style="overflow-x:auto"><table><thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Status</th></tr></thead><tbody>
+    ${prods.slice(-5).reverse().map(p=>`<tr><td class="td-name">${p.name}</td><td class="td-cat">${p.category}</td><td class="td-price">$${p.price}</td><td><span class="status-dot ${p.available?'dot-on':'dot-off'}"></span>${p.available?'Live':'Hidden'}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+// ─── PRODUCTS TABLE ───
+function renderProdTable(){
+  const d=getData();const prods=d.products||[];
+  const q=(document.getElementById('prodSearch')?.value||'').toLowerCase();
+  const filtered=q?prods.filter(p=>p.name.toLowerCase().includes(q)||p.category.toLowerCase().includes(q)):prods;
+  document.getElementById('prodTableBody').innerHTML=filtered.map(p=>`<tr>
+    <td><div class="td-name">${p.name}</div><div style="font-size:0.75rem;color:var(--muted)">${p.style}</div></td>
+    <td class="td-cat">${p.category}</td>
+    <td class="td-price">$${p.price}${p.oldPrice?`<span class="td-old">$${p.oldPrice}</span>`:''}</td>
+    <td>${p.badge?`<span class="td-badge badge-${p.badge}">${p.badge.toUpperCase()}</span>`:'-'}</td>
+    <td><div class="color-preview">${(p.colors||[]).map(c=>`<div class="cp" style="background:${c}"></div>`).join('')}</div></td>
+    <td><span class="status-dot ${p.available?'dot-on':'dot-off'}"></span>${p.available?'Live':'Hidden'}</td>
+    <td><div class="td-actions">
+      <button class="btn btn-ghost btn-sm" onclick="editProduct(${p.id})">✏ Edit</button>
+      <button class="btn ${p.available?'btn-red':'btn-green'} btn-sm" onclick="toggleAvail(${p.id})">${p.available?'Hide':'Show'}</button>
+    </div></td>
+  </tr>`).join('');
+}
+function toggleAvail(id){
+  const d=getData();const p=d.products.find(x=>x.id===id);
+  if(p){p.available=!p.available;saveData(d);renderProdTable();renderDashboard();toast(p.available?'Product is now live':'Product hidden');}
+}
+
+// ─── PRODUCT MODAL ───
+let editingColors=[];
+let editingId=null;
+
+function openProductModal(){
+  editingId=null;editingColors=[];
+  document.getElementById('pmTitle').textContent='ADD PRODUCT';
+  document.getElementById('deleteBtn').style.display='none';
+  document.getElementById('pm_id').value='';
+  ['pm_name','pm_style','pm_price','pm_oldPrice','pm_material','pm_uv','pm_desc','pm_imgUrl'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('pm_cat').value='Street';
+  document.getElementById('pm_badge').value='';
+  document.getElementById('pm_avail').value='true';
+  document.getElementById('pm_img').value='';
+  document.getElementById('pm_imgPreview').style.display='none';
+  document.getElementById('pm_uv').value='UV400';
+  renderColorBuilder();
+  document.getElementById('prodModal').classList.add('open');
+  switchTab('products');
+}
+
+function editProduct(id){
+  const d=getData();const p=d.products.find(x=>x.id===id);if(!p)return;
+  editingId=id;editingColors=[...(p.colors||[])];
+  document.getElementById('pmTitle').textContent='EDIT PRODUCT';
+  document.getElementById('deleteBtn').style.display='inline-flex';
+  document.getElementById('pm_id').value=id;
+  document.getElementById('pm_name').value=p.name||'';
+  document.getElementById('pm_style').value=p.style||'';
+  document.getElementById('pm_price').value=p.price||'';
+  document.getElementById('pm_oldPrice').value=p.oldPrice||'';
+  document.getElementById('pm_material').value=p.material||'';
+  document.getElementById('pm_uv').value=p.uv||'UV400';
+  document.getElementById('pm_desc').value=p.desc||'';
+  document.getElementById('pm_cat').value=p.category||'Street';
+  document.getElementById('pm_badge').value=p.badge||'';
+  document.getElementById('pm_avail').value=p.available===false?'false':'true';
+  document.getElementById('pm_img').value=p.image||'';
+  document.getElementById('pm_imgUrl').value=p.image||'';
+  if(p.image){const pr=document.getElementById('pm_imgPreview');pr.src=p.image;pr.style.display='block';}
+  else{document.getElementById('pm_imgPreview').style.display='none';}
+  renderColorBuilder();
+  document.getElementById('prodModal').classList.add('open');
+}
+
+function closeProdModal(){document.getElementById('prodModal').classList.remove('open');}
+
+function saveProduct(){
+  const name=document.getElementById('pm_name').value.trim();
+  if(!name)return toast('Product name required','err');
+  const price=parseFloat(document.getElementById('pm_price').value);
+  if(isNaN(price)||price<0)return toast('Valid price required','err');
+  const d=getData();
+  const prod={
+    id:editingId||nextId(d),
+    name,style:document.getElementById('pm_style').value,
+    category:document.getElementById('pm_cat').value,
+    badge:document.getElementById('pm_badge').value,
+    price,
+    oldPrice:parseFloat(document.getElementById('pm_oldPrice').value)||null,
+    desc:document.getElementById('pm_desc').value,
+    material:document.getElementById('pm_material').value,
+    uv:document.getElementById('pm_uv').value||'UV400',
+    colors:editingColors,
+    available:document.getElementById('pm_avail').value==='true',
+    image:document.getElementById('pm_img').value||''
+  };
+  if(editingId){
+    const idx=d.products.findIndex(x=>x.id===editingId);
+    if(idx>-1)d.products[idx]=prod;
+  } else {d.products.push(prod);}
+  saveData(d);closeProdModal();renderProdTable();renderDashboard();
+  toast(editingId?'Product updated':'Product added');
+}
+
+function deleteProduct(){
+  if(!confirm('Delete this product? This cannot be undone.'))return;
+  const d=getData();d.products=d.products.filter(x=>x.id!==editingId);
+  saveData(d);closeProdModal();renderProdTable();renderDashboard();toast('Product deleted');
+}
+
+// Colors
+function renderColorBuilder(){
+  document.getElementById('colorBuilder').innerHTML=editingColors.map((c,i)=>`
+    <div class="color-chip">
+      <div class="color-chip-dot" style="background:${c}"></div>
+      <span style="font-size:0.75rem;font-family:var(--font-c);color:var(--muted)">${c}</span>
+      <button class="color-chip-del" onclick="removeColor(${i})">✕</button>
+    </div>`).join('');
+}
+function addColor(){
+  const c=document.getElementById('colorPicker').value;
+  if(!editingColors.includes(c)){editingColors.push(c);renderColorBuilder();}
+}
+function removeColor(i){editingColors.splice(i,1);renderColorBuilder();}
+
+// Image upload
+function handleImgUpload(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const data=e.target.result;
+    document.getElementById('pm_img').value=data;
+    document.getElementById('pm_imgUrl').value='';
+    const pr=document.getElementById('pm_imgPreview');pr.src=data;pr.style.display='block';
+  };
+  reader.readAsDataURL(file);
+}
+function previewFromUrl(){
+  const url=document.getElementById('pm_imgUrl').value;
+  document.getElementById('pm_img').value=url;
+  if(url){const pr=document.getElementById('pm_imgPreview');pr.src=url;pr.style.display='block';}
+  else{document.getElementById('pm_imgPreview').style.display='none';}
+}
+
+// ─── HERO ───
+function loadHeroForm(){
+  const d=getData();const h=d.hero||{};
+  ['tag','title','sub','stat1','statL1','stat2','statL2','stat3','statL3'].forEach(k=>{
+    const el=document.getElementById('h_'+k);if(el)el.value=h[k]||'';
+  });
+}
+function saveHero(){
+  const d=getData();
+  d.hero={
+    tag:document.getElementById('h_tag').value,
+    title:document.getElementById('h_title').value,
+    sub:document.getElementById('h_sub').value,
+    stat1:document.getElementById('h_stat1').value,statL1:document.getElementById('h_statL1').value,
+    stat2:document.getElementById('h_stat2').value,statL2:document.getElementById('h_statL2').value,
+    stat3:document.getElementById('h_stat3').value,statL3:document.getElementById('h_statL3').value,
+  };
+  saveData(d);toast('Hero section saved');
+}
+
+// ─── TICKER ───
+function loadTickerForm(){const d=getData();document.getElementById('t_ticker').value=d.ticker||'';}
+function saveTicker(){const d=getData();d.ticker=document.getElementById('t_ticker').value;saveData(d);toast('Ticker saved');}
+
+// ─── ABOUT ───
+let aboutVals=[];
+function loadAboutForm(){
+  const d=getData();const a=d.about||{};
+  document.getElementById('a_tag').value=a.tag||'';
+  document.getElementById('a_title').value=a.title||'';
+  document.getElementById('a_text1').value=a.text1||'';
+  document.getElementById('a_text2').value=a.text2||'';
+  aboutVals=JSON.parse(JSON.stringify(a.vals||DEFAULT.about.vals));
+}
+function renderValsBuilder(){
+  document.getElementById('valsBuilder').innerHTML=aboutVals.map((v,i)=>`
+    <div class="val-row">
+      <input class="f-input" value="${v.t}" oninput="aboutVals[${i}].t=this.value" placeholder="Title"/>
+      <input class="f-input" value="${v.d}" oninput="aboutVals[${i}].d=this.value" placeholder="Description"/>
+      <button class="btn btn-red btn-sm" onclick="removeVal(${i})">✕</button>
+    </div>`).join('');
+}
+function addVal(){aboutVals.push({t:'',d:''});renderValsBuilder();}
+function removeVal(i){aboutVals.splice(i,1);renderValsBuilder();}
+function saveAbout(){
+  const d=getData();
+  d.about={
+    tag:document.getElementById('a_tag').value,
+    title:document.getElementById('a_title').value,
+    text1:document.getElementById('a_text1').value,
+    text2:document.getElementById('a_text2').value,
+    vals:aboutVals
+  };
+  saveData(d);toast('About section saved');
+}
+
+// ─── CONTACT ───
+let cItems=[];
+function loadContactForm(){
+  const d=getData();const c=d.contact||DEFAULT.contact;
+  document.getElementById('c_title').value=c.title||'';
+  cItems=JSON.parse(JSON.stringify(c.items||[]));
+}
+function renderContactItems(){
+  document.getElementById('contactItemsBuilder').innerHTML=cItems.map((ci,i)=>`
+    <div class="ci-row">
+      <input class="ci-icon-inp" value="${ci.icon}" oninput="cItems[${i}].icon=this.value" maxlength="2"/>
+      <input class="ci-inp" value="${ci.label}" oninput="cItems[${i}].label=this.value" placeholder="Label"/>
+      <input class="ci-inp" value="${ci.val}" oninput="cItems[${i}].val=this.value" placeholder="Value (e.g. phone number)"/>
+      <input class="ci-inp" value="${ci.sub}" oninput="cItems[${i}].sub=this.value" placeholder="Subtitle"/>
+      <button class="btn btn-red btn-sm" onclick="removeCItem(${i})">✕</button>
+    </div>`).join('');
+}
+function addContactItem(){cItems.push({icon:'📌',label:'',val:'',sub:''});renderContactItems();}
+function removeCItem(i){cItems.splice(i,1);renderContactItems();}
+function saveContact(){
+  const d=getData();
+  d.contact={title:document.getElementById('c_title').value,items:cItems};
+  saveData(d);toast('Contact info saved');
+}
+
+// ─── FOOTER ───
+let socials=[];
+function loadFooterForm(){
+  const d=getData();
+  document.getElementById('f_copy').value=d.footer||'';
+  socials=JSON.parse(JSON.stringify(d.socials||DEFAULT.socials));
+}
+function renderSocialsBuilder(){
+  document.getElementById('socialsBuilder').innerHTML=socials.map((s,i)=>`
+    <div class="soc-row">
+      <input class="f-input" value="${s.label}" oninput="socials[${i}].label=this.value" placeholder="IG"/>
+      <input class="f-input" value="${s.url}" oninput="socials[${i}].url=this.value" placeholder="https://..."/>
+      <button class="btn btn-red btn-sm" onclick="removeSocial(${i})">✕</button>
+    </div>`).join('');
+}
+function addSocial(){socials.push({label:'',url:'#'});renderSocialsBuilder();}
+function removeSocial(i){socials.splice(i,1);renderSocialsBuilder();}
+function saveFooter(){
+  const d=getData();d.footer=document.getElementById('f_copy').value;d.socials=socials;
+  saveData(d);toast('Footer & socials saved');
+}
+
+// ─── IMPORT / EXPORT ───
+function exportData(){
+  const d=getData();const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ryshades-data.json';a.click();
+  toast('Data exported');
+}
+function importTrigger(){document.getElementById('importFile').click();}
+function importData(input){
+  const file=input.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{const d=JSON.parse(e.target.result);saveData(d);toast('Data imported successfully');renderDashboard();}
+    catch{toast('Invalid JSON file','err');}
+  };
+  r.readAsText(file);input.value='';
+}
+function resetData(){
+  if(!confirm('Reset ALL site data to defaults? This cannot be undone.'))return;
+  localStorage.removeItem('ryShadesData');renderDashboard();toast('Data reset to defaults');
+}
+
+// ─── CLOSE MODAL ON OUTSIDE CLICK ───
+document.getElementById('prodModal').addEventListener('click',function(e){if(e.target===this)closeProdModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProdModal();});
+
+// ─── INIT ───
+if(localStorage.getItem('ryAdminSession')==='1')initApp();
+document.getElementById('pwdInput')?.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+</script>
+</body>
+</html>
